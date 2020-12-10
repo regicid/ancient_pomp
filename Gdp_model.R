@@ -5,7 +5,7 @@ library(doParallel)
 registerDoParallel(48)
 getDoParWorkers()
 
-Countries = c("Arab","China","Europe","Greece","India")
+Countries = c("Arab","China","Europe","India")
 Results = read.csv("./Results.csv")
 Results$gdp = scale(Results$gdp - min(Results$gdp,na.rm = TRUE),center = FALSE)
 Results = Results[-1]
@@ -104,4 +104,4 @@ foreach (guess=iter(guesses,"row"),
          } -> mifs4
 
 
-saveRDS(mifs,"./mifs_pomp")
+saveRDS(mifs4,"./mifs_pomp3")
