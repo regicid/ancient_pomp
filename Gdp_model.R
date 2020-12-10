@@ -98,3 +98,5 @@ mifs %>%
   geom_line()+
   facet_wrap(~variable,scales="free_y")+
   guides(color=FALSE)
+
+saveRDS(mifs,"./mifs_pomp")
