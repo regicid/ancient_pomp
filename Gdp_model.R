@@ -7,15 +7,15 @@ getDoParWorkers()
 Countries = c("Arab","China","Europe","Greece","India")
 Results = Results_all_tidy
 Results$Nobs = Results$value
-Results$gdp = scale(Results$gdp,center = FALSE)
+Results$gdp = scale(Results$gdp - min(Results$gdp,na.rm = TRUE),center = FALSE)
 
 #Results$gdp[is.na(Results$gdp)] = 0
 #Results$Nobs[is.na(Results$Nobs)] = 0
 
 PARAM = c("a","c","z","sigma","sigma_obs","N_0")
-rwsd = rw.sd(a=.1,z = .1,sigma=.1,sigma_obs = .1,N_0=ivp(.1),c=.1)
+rwsd = rw.sd(a=.1,z = .2,sigma=.1,sigma_obs = .1,N_0=ivp(.1),c=.1)
 Csnippet("double eps = rnorm(0,pow(sigma,2));
-         N = z*N + a*gdp  + c + eps;
+         N = pow(z,2)*N + a*gdp  + c + eps;
          ") -> evol_diff
 
 Pomps = list()
@@ -55,7 +55,7 @@ Model_diff %>%
     shared.start=unlist(start),
     specific.start = Model_diff@specific,
     Np=2000,
-    Nmif=1000,
+    Nmif=500,
     cooling.fraction.50=0.5,
     cooling.type="hyperbolic",
     rw.sd= rwsd,
@@ -68,7 +68,6 @@ Data$iteration = as.numeric(row.names(mf1@pconv.rec))
 Data = gather(Data,"key","value",-iteration)
 ggplot(Data,aes(iteration,value)) + geom_line()+ facet_wrap(vars(key),scales = "free")
 
-DATA = Data[0,]
 for(i in 1:length(mifs)){
   Data = data.frame(mifs[[2]]@pconv.rec)
   Data$iteration = as.numeric(row.names(mifs[[1]]@pconv.rec))
