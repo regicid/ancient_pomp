@@ -75,11 +75,11 @@ Model_diff %>%
   ) -> mf1
 
 
-mf1 = mifs2[47][[1]]
-Data = data.frame(mf1@pconv.rec)
-Data$iteration = as.numeric(row.names(mf1@pconv.rec))
-Data = gather(Data,"key","value",-iteration)
-ggplot(Data,aes(iteration,value)) + geom_line()+ facet_wrap(vars(key),scales = "free")
+#mf1 = mifs2[47][[1]]
+#Data = data.frame(mf1@pconv.rec)
+#Data$iteration = as.numeric(row.names(mf1@pconv.rec))
+#Data = gather(Data,"key","value",-iteration)
+#ggplot(Data,aes(iteration,value)) + geom_line()+ facet_wrap(vars(key),scales = "free")
 
 #for(i in 1:length(mifs)){
 #  Data = data.frame(mifs[[2]]@pconv.rec)
@@ -87,8 +87,8 @@ ggplot(Data,aes(iteration,value)) + geom_line()+ facet_wrap(vars(key),scales = "
 #  Data = gather(Data,"key","value",-iteration)
 #}
 
-lower = c(a = 0.2,sigma=1,N_0 = 0,sigma_obs=0.7,z = .8,d = -0.6,b = -0.5,c =-.5,e=-0.3,f=-0.3)
-upper = c(a = 0.6,sigma=1.3, N_0 = .3,sigma_obs=1,z = 1.3,d = 1,b = 0.5,c = .5,e=-0.3,f=-0.3)
+lower = c(a = 0,sigma=1,N_0 = 0,sigma_obs=0.7,z = .8,d = -0.6,b = -0.5,c =-.5,e=-0.3,f=-0.3)
+upper = c(a = 0.6,sigma=1.4, N_0 = .3,sigma_obs=1,z = 1,d = 1,b = 0.5,c = .5,e=-0.3,f=-0.3)
 sobolDesign(lower = lower[PARAM], upper = upper[PARAM], nseq = 48) -> guesses
 
 foreach (guess=iter(guesses,"row"),
