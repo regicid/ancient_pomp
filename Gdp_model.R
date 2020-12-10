@@ -96,7 +96,7 @@ foreach (guess=iter(guesses,"row"),
            
            mf1 %>% panelPomp::mif2(shared.start=unlist(guess),
                                    specific.start = Model_diff@specific,
-                                   Np=3000,Nmif=5000,cooling.fraction.50=0.5,
+                                   Np=3000,Nmif=12000,cooling.fraction.50=0.5,
                                    cooling.type="hyperbolic",rw.sd= rwsd,pars = PARAM)
            
            
