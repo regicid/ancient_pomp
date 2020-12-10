@@ -1,14 +1,14 @@
-library(tidyr)
+library (panelPomp) 
+library (tidyr)
 library(foreach)
 library(doParallel)
-registerDoParallel()
+registerDoParallel(48)
 getDoParWorkers()
 
 Countries = c("Arab","China","Europe","Greece","India")
-Results = Results_all_tidy
-Results$Nobs = Results$value
+Results = read.csv("./Results.csv")
 Results$gdp = scale(Results$gdp - min(Results$gdp,na.rm = TRUE),center = FALSE)
-
+Results = Results[-1]
 #Results$gdp[is.na(Results$gdp)] = 0
 #Results$Nobs[is.na(Results$Nobs)] = 0
 
@@ -18,6 +18,18 @@ Csnippet("double eps = rnorm(0,pow(sigma,2));
          N = pow(z,2)*N + a*gdp  + c + eps;
          ") -> evol_diff
 
+Csnippet("
+         N = N_0;
+         ") -> rinit
+Csnippet("
+         double eps_obs = rnorm(0,pow(sigma_obs,2));
+         Nobs = N + eps_obs;
+         ") -> rmeas
+
+
+Csnippet("
+         lik = dnorm(Nobs,N,pow(sigma_obs,2),give_log);
+         ") -> dmeas
 Pomps = list()
 
 for(country in Countries){
@@ -35,7 +47,7 @@ for(country in Countries){
       times="date", t0=Data$date[1],
       rinit=rinit,
       covar = covariate_table(Gdp, times= "date"),
-      rprocess=discrete_time(evol_diff,delta.t = 50),
+      rprocess=discrete_time(evol_diff,delta.t = 100),
       dmeasure = dmeas,
       obsnames = c("Nobs"),
       statenames=c("N"),
@@ -55,7 +67,7 @@ Model_diff %>%
     shared.start=unlist(start),
     specific.start = Model_diff@specific,
     Np=2000,
-    Nmif=500,
+    Nmif=5,
     cooling.fraction.50=0.5,
     cooling.type="hyperbolic",
     rw.sd= rwsd,
@@ -66,17 +78,17 @@ Model_diff %>%
 Data = data.frame(mf1@pconv.rec)
 Data$iteration = as.numeric(row.names(mf1@pconv.rec))
 Data = gather(Data,"key","value",-iteration)
-ggplot(Data,aes(iteration,value)) + geom_line()+ facet_wrap(vars(key),scales = "free")
+#ggplot(Data,aes(iteration,value)) + geom_line()+ facet_wrap(vars(key),scales = "free")
 
-for(i in 1:length(mifs)){
-  Data = data.frame(mifs[[2]]@pconv.rec)
-  Data$iteration = as.numeric(row.names(mifs[[1]]@pconv.rec))
-  Data = gather(Data,"key","value",-iteration)
-}
+#for(i in 1:length(mifs)){
+#  Data = data.frame(mifs[[2]]@pconv.rec)
+#  Data$iteration = as.numeric(row.names(mifs[[1]]@pconv.rec))
+#  Data = gather(Data,"key","value",-iteration)
+#}
 
 lower = c(a = 0.2,sigma=0.5,N_0 = 0,sigma_obs=0.2,z = .8,d = -0.6,b = -0.5,c =-.5,e=-0.3,f=-0.3)
 upper = c(a = 0.6,sigma=1, N_0 = 0,sigma_obs=0.6,z = 1.3,d = 1,b = 0.5,c = .5,e=-0.3,f=-0.3)
-sobolDesign(lower = lower[PARAM], upper = upper[PARAM], nseq = 12) -> guesses
+sobolDesign(lower = lower[PARAM], upper = upper[PARAM], nseq = 48) -> guesses
 
 foreach (guess=iter(guesses,"row"),
          .combine=c, .packages=c("panelPomp"),
@@ -84,19 +96,11 @@ foreach (guess=iter(guesses,"row"),
            
            mf1 %>% panelPomp::mif2(shared.start=unlist(guess),
                                    specific.start = Model_diff@specific,
-                                   Np=3000,Nmif=10000,cooling.fraction.50=0.5,
+                                   Np=3000,Nmif=5000,cooling.fraction.50=0.5,
                                    cooling.type="hyperbolic",rw.sd= rwsd,pars = PARAM)
            
            
          } -> mifs
 
-mifs %>%
-  traces() %>%
-  melt() %>%
-  filter(variable!="b") %>%
-  ggplot(aes(x=iteration,y=value,group=L1,color=L1))+
-  geom_line()+
-  facet_wrap(~variable,scales="free_y")+
-  guides(color=FALSE)
 
 saveRDS(mifs,"./mifs_pomp")
