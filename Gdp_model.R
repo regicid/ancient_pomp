@@ -7,10 +7,10 @@ getDoParWorkers()
 
 Countries = c("Arab","China","Europe","India","Greece")
 Results = read.csv("./Results.csv")
-Results$gdp = scale(Results$gdp - min(Results$gdp,na.rm = TRUE),center = FALSE)
+Results$gdp = scale(Results$gdp - min(Results$gdp,na.rm = TRUE),center = TRUE)
 Results = Results[-1]
 #Results$gdp[is.na(Results$gdp)] = 0
-#Results$Nobs = log(Results$Nobs+1) 
+Results$Nobs = log(Results$Nobs+1) 
 
 PARAM = c("a","c","z","sigma","sigma_obs","N_0")
 rwsd = rw.sd(a=.1,z = .2,sigma=.1,sigma_obs = .1,N_0=ivp(.1),c=.1)
@@ -104,4 +104,4 @@ foreach (guess=iter(guesses,"row"),
          } -> mifs4
 
 
-saveRDS(mifs4,"./mifs_pomp_log")
+saveRDS(mifs4,"./mifs_pomp_logg")
