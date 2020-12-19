@@ -5,12 +5,12 @@ library(doParallel)
 registerDoParallel(48)
 getDoParWorkers()
 
-Countries = c("Arab","China","Europe","India")
+Countries = c("Arab","China","Europe","India","Greece")
 Results = read.csv("./Results.csv")
 Results$gdp = scale(Results$gdp - min(Results$gdp,na.rm = TRUE),center = FALSE)
 Results = Results[-1]
 #Results$gdp[is.na(Results$gdp)] = 0
-#Results$Nobs[is.na(Results$Nobs)] = 0
+Results$Nobs = log(Results$Nobs+1) 
 
 PARAM = c("a","c","z","sigma","sigma_obs","N_0")
 rwsd = rw.sd(a=.1,z = .2,sigma=.1,sigma_obs = .1,N_0=ivp(.1),c=.1)
@@ -97,7 +97,7 @@ foreach (guess=iter(guesses,"row"),
            
            mf1 %>% panelPomp::mif2(shared.start=unlist(guess),
                                    specific.start = Model_diff@specific,
-                                   Np=10000,Nmif=15000,cooling.fraction.50=0.3,
+                                   Np=5000,Nmif=5000,cooling.fraction.50=0.3,
 
                                    cooling.type="hyperbolic",rw.sd= rwsd,pars = PARAM)
            
@@ -105,4 +105,4 @@ foreach (guess=iter(guesses,"row"),
          } -> mifs4
 
 
-saveRDS(mifs4,"./mifs_pomp3")
+saveRDS(mifs4,"./mifs_pomp_log")
