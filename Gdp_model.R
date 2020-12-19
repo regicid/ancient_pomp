@@ -10,7 +10,7 @@ Results = read.csv("./Results.csv")
 Results$gdp = scale(Results$gdp - min(Results$gdp,na.rm = TRUE),center = FALSE)
 Results = Results[-1]
 #Results$gdp[is.na(Results$gdp)] = 0
-Results$Nobs = log(Results$Nobs+1) 
+#Results$Nobs = log(Results$Nobs+1) 
 
 PARAM = c("a","c","z","sigma","sigma_obs","N_0")
 rwsd = rw.sd(a=.1,z = .2,sigma=.1,sigma_obs = .1,N_0=ivp(.1),c=.1)
@@ -22,13 +22,12 @@ Csnippet("
          N = N_0;
          ") -> rinit
 Csnippet("
-         double eps_obs = rnorm(1,pow(sigma_obs,2));
-         Nobs = N*eps_obs;
-         ") -> rmeas
+         Nobs = rnorm(N,fabs(N)*pow(sigma_obs,2));
+	") -> rmeas
 
 
 Csnippet("
-         lik = dnorm(Nobs,N,abs(N)*pow(sigma_obs,2),give_log);
+         lik = dnorm(Nobs,N,fabs(N)*pow(sigma_obs,2),give_log);
          ") -> dmeas
 Pomps = list()
 
