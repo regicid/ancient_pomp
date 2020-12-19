@@ -22,13 +22,13 @@ Csnippet("
          N = N_0;
          ") -> rinit
 Csnippet("
-         double eps_obs = rnorm(0,pow(sigma_obs,2));
-         Nobs = N + eps_obs;
+         double eps_obs = rnorm(1,pow(sigma_obs,2));
+         Nobs = N*eps_obs;
          ") -> rmeas
 
 
 Csnippet("
-         lik = dnorm(Nobs,N,pow(sigma_obs,2),give_log);
+         lik = dnorm(Nobs,N,abs(N)*pow(sigma_obs,2),give_log);
          ") -> dmeas
 Pomps = list()
 
@@ -61,13 +61,13 @@ p = rep(0,length(PARAM))
 names(p) = PARAM
 
 Model_diff = panelPomp(Pomps,shared = p)
-start = c(a = .5,sigma = .2,N_0 = 0,sigma_obs = .6,z = .5,c=0)
+start = c(a = .5,sigma = .2,N_0 = 0,sigma_obs = .3,z = .5,c=0)
 Model_diff %>%
   panelPomp::mif2(
     shared.start=unlist(start),
     specific.start = Model_diff@specific,
     Np=2000,
-    Nmif=5,
+    Nmif=50,
     cooling.fraction.50=0.5,
     cooling.type="hyperbolic",
     rw.sd= rwsd,
