@@ -22,12 +22,13 @@ Csnippet("
          N = N_0;
          ") -> rinit
 Csnippet("
-         Nobs = rnorm(N,fabs(N)*pow(sigma_obs,2));
+         double eps = rnorm(0,pow(sigma_obs,2));
+         Nobs = N + eps;
 	") -> rmeas
 
 
 Csnippet("
-         lik = dnorm(Nobs,N,fabs(N)*pow(sigma_obs,2),give_log);
+         lik = dnorm(Nobs,N,pow(sigma_obs,2),give_log);
          ") -> dmeas
 Pomps = list()
 
