@@ -22,12 +22,12 @@ Csnippet("
          N = N_0;
          ") -> rinit
 Csnippet("
-         Nobs = rnorm(N,fabs(N)*pow(sigma_obs,2));
+         Nobs = rnorm(N,pow(sigma_obs,2));
 	") -> rmeas
 
 
 Csnippet("
-         lik = dnorm(Nobs,N,fabs(N)*pow(sigma_obs,2),give_log);
+         lik = dnorm(Nobs,N,pow(sigma_obs,2),give_log);
          ") -> dmeas
 Pomps = list()
 
@@ -96,7 +96,7 @@ foreach (guess=iter(guesses,"row"),
            
            mf1 %>% panelPomp::mif2(shared.start=unlist(guess),
                                    specific.start = Model_diff@specific,
-                                   Np=5000,Nmif=5000,cooling.fraction.50=0.3,
+                                   Np=10000,Nmif=10000,cooling.fraction.50=0.3,
 
                                    cooling.type="hyperbolic",rw.sd= rwsd,pars = PARAM)
            
