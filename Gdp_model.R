@@ -7,7 +7,7 @@ getDoParWorkers()
 
 Countries = c("Arab","China","Europe","India","Greece")
 Results = read.csv("./Results.csv")
-Results$gdp = scale(Results$gdp - min(Results$gdp,na.rm = TRUE),center = TRUE)
+Results$gdp = scale(Results$gdp - min(Results$gdp,na.rm = TRUE),center = FALSE)
 Results = Results[-1]
 #Results$gdp[is.na(Results$gdp)] = 0
 Results$Nobs = log(Results$Nobs+1) 
@@ -96,7 +96,7 @@ foreach (guess=iter(guesses,"row"),
            
            mf1 %>% panelPomp::mif2(shared.start=unlist(guess),
                                    specific.start = Model_diff@specific,
-                                   Np=10000,Nmif=10000,cooling.fraction.50=0.3,
+                                   Np=5000,Nmif=5000,cooling.fraction.50=0.3,
 
                                    cooling.type="hyperbolic",rw.sd= rwsd,pars = PARAM)
            
