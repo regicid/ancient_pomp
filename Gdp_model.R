@@ -88,7 +88,7 @@ Model_diff %>%
 
 lower = c(a = 0,sigma=1,N_0 = 0,sigma_obs=0.7,z = .8,d = -0.6,b = -0.5,c =-.5,e=-0.3,f=-0.3,sigma_obs2=.1)
 upper = c(a = 0.6,sigma=1.4, N_0 = .3,sigma_obs=1,z = 1,d = 1,b = 0.5,c = .5,e=-0.3,f=-0.3,sigma_obs2=.5)
-sobolDesign(lower = lower[PARAM], upper = upper[PARAM], nseq = 48) -> guesses
+sobolDesign(lower = lower[PARAM], upper = upper[PARAM], nseq = 16) -> guesses
 
 foreach (guess=iter(guesses,"row"),
          .combine=c, .packages=c("panelPomp"),
