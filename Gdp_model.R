@@ -25,7 +25,7 @@ Csnippet("
          Nobs = rnorm(N,pow(sigma_obs,2)+fmax(N,0)*pow(sigma_obs2,2));
 	") -> rmeas
 Csnippet("
-         Nobs = rnorm(N,pow(sigma_obs,2)*pow(sigma_obs2,(date+600)/100;
+         Nobs = rnorm(N,pow(sigma_obs,2)*pow(sigma_obs2,(date+600)/100));
          ") -> rmeas
 
 
@@ -34,7 +34,7 @@ Csnippet("
          ") -> dmeas
 
 Csnippet("
-         lik = dnorm(Nobs,N,pow(sigma_obs,2)*pow(sigma_obs2,(date+600)/100,give_log);
+         lik = dnorm(Nobs,N,pow(sigma_obs,2)*pow(sigma_obs2,(date+600)/100),give_log);
          ") -> dmeas
 Pomps = list()
 
