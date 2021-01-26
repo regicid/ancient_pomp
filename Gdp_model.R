@@ -25,7 +25,7 @@ Csnippet("
          Nobs = rnorm(N,pow(sigma_obs,2)+fmax(N,0)*pow(sigma_obs2,2));
 	") -> rmeas
 Csnippet("
-         Nobs = rnorm(N,pow(sigma_obs,2)*pow(sigma_obs2,(date+600)/100));
+         Nobs = rnorm(N,pow(sigma_obs,2)*pow(sigma_obs2,(time+600)/100));
          ") -> rmeas
 
 
@@ -34,7 +34,7 @@ Csnippet("
          ") -> dmeas
 
 Csnippet("
-         lik = dnorm(Nobs,N,pow(sigma_obs,2)*pow(sigma_obs2,(date+600)/100),give_log);
+         lik = dnorm(Nobs,N,pow(sigma_obs,2)*pow(sigma_obs2,(time+600)/100),give_log);
          ") -> dmeas
 Pomps = list()
 
@@ -47,6 +47,7 @@ for(country in Countries){
   Data = Data[z:nrow(Data),c(2,19)]
   Gdp$cum = vector("numeric",length = nrow(Gdp))
   Gdp$cum[2:nrow(Gdp)] = cumsum(Data$Nobs)[1:nrow(Gdp)-1]
+  Gdp$time = Gdp$date
   
   Data %>%
     pomp(
@@ -59,7 +60,7 @@ for(country in Countries){
       statenames=c("N"),
       rmeasure=rmeas,
       paramnames=PARAM,
-      covarnames = c("gdp","cum",'date')
+      covarnames = c("gdp","cum",'time')
     ) -> Pomps[[country]]
 }
 
