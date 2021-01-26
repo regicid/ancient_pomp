@@ -5,14 +5,14 @@ library(doParallel)
 registerDoParallel(48)
 getDoParWorkers()
 
-Countries = c("Arab","China","Europe","India")
+Countries = c("Arab","China","Europe","India","Greece")
 Results = read.csv("./Results.csv")
 Results$gdp = scale(Results$gdp - min(Results$gdp,na.rm = TRUE),center = FALSE)
 Results = Results[-1]
 #Results$gdp[is.na(Results$gdp)] = 0
-#Results$Nobs = log(Results$Nobs+1) 
+Results$Nobs = log(Results$Nobs+1) 
 
-PARAM = c("a","c","z","sigma","sigma_obs","N_0")
+PARAM = c("a","c","z","sigma","sigma_obs","sigma_obs2","N_0")
 rwsd = rw.sd(a=.1,z = .2,sigma=.1,sigma_obs = .1,N_0=ivp(.1),c=.1)
 Csnippet("double eps = rnorm(0,pow(sigma,2));
          N = pow(z,2)*N + a*gdp  + c + eps;
@@ -22,12 +22,12 @@ Csnippet("
          N = N_0;
          ") -> rinit
 Csnippet("
-         Nobs = rnorm(N,pow(sigma_obs,2));
+         Nobs = rnorm(N,pow(sigma_obs,2)+N*pow(sigma_obs2,2));
 	") -> rmeas
 
 
 Csnippet("
-         lik = dnorm(Nobs,N,pow(sigma_obs,2),give_log);
+         lik = dnorm(Nobs,N,pow(sigma_obs,2)+N*pow(sigma_obs2,2),give_log);
          ") -> dmeas
 Pomps = list()
 
@@ -60,7 +60,7 @@ p = rep(0,length(PARAM))
 names(p) = PARAM
 
 Model_diff = panelPomp(Pomps,shared = p)
-start = c(a = .5,sigma = .2,N_0 = 0,sigma_obs = .3,z = .5,c=0)
+start = c(a = .5,sigma = .2,N_0 = 0,sigma_obs = .3,sigma_obs2 = .2,z = .5,c=0)
 Model_diff %>%
   panelPomp::mif2(
     shared.start=unlist(start),
@@ -86,8 +86,8 @@ Model_diff %>%
 #  Data = gather(Data,"key","value",-iteration)
 #}
 
-lower = c(a = 0,sigma=1,N_0 = 0,sigma_obs=0.7,z = .8,d = -0.6,b = -0.5,c =-.5,e=-0.3,f=-0.3)
-upper = c(a = 0.6,sigma=1.4, N_0 = .3,sigma_obs=1,z = 1,d = 1,b = 0.5,c = .5,e=-0.3,f=-0.3)
+lower = c(a = 0,sigma=1,N_0 = 0,sigma_obs=0.7,z = .8,d = -0.6,b = -0.5,c =-.5,e=-0.3,f=-0.3,sigma_obs2=.1)
+upper = c(a = 0.6,sigma=1.4, N_0 = .3,sigma_obs=1,z = 1,d = 1,b = 0.5,c = .5,e=-0.3,f=-0.3,sigma_obs2=.5)
 sobolDesign(lower = lower[PARAM], upper = upper[PARAM], nseq = 48) -> guesses
 
 foreach (guess=iter(guesses,"row"),
