@@ -13,7 +13,7 @@ Results = Results[-1]
 Results$Nobs = log(Results$Nobs+1) 
 
 PARAM = c("a","c","z","sigma","sigma_obs","sigma_obs2","N_0")
-rwsd = rw.sd(a=.1,z = .2,sigma=.1,sigma_obs = .1,N_0=ivp(.1),c=.1)
+rwsd = rw.sd(a=.1,z = .2,sigma=.1,sigma_obs = .1,sigma_obs2=.1,N_0=ivp(.1),c=.1)
 Csnippet("double eps = rnorm(0,pow(sigma,2));
          N = pow(z,2)*N + a*gdp  + c + eps;
          ") -> evol_diff
